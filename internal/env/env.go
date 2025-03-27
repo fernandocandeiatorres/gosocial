@@ -26,3 +26,11 @@ func GetInt(key string, fallback int) int {
 
 	return valAsInt
 }
+
+// Helper function to get env var as int with default
+func GetEnvInt(key string, defaultVal int) int {
+	if val, err := strconv.Atoi(os.Getenv(key)); err == nil {
+		return val
+	}
+	return defaultVal
+}

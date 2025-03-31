@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/fernandocandeiatorres/gosocial/internal/db"
 	"github.com/fernandocandeiatorres/gosocial/internal/env"
 	"github.com/fernandocandeiatorres/gosocial/internal/store"
 	"github.com/joho/godotenv"
@@ -27,13 +28,25 @@ func main () {
 		},
 	}
 
-	store := store.NewStorage(nil)
+	db, err := db.New(
+		cfg.db.addr, 
+		cfg.db.maxOpenConns, 
+		cfg.db.maxIdleConns, 
+		cfg.db.maxIdleTime,
+	)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	defer db.Close()
+	log.Println("database connection pool established")
+
+	store := store.NewStorage(db)
 
 	app := &application{
 		config: cfg,
 		store: store,
 	}
-
 
 	mux := app.mount()
 
